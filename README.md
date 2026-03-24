@@ -1,4 +1,4 @@
-# 🏦 Stellar Lending/Borrowing Protocol
+# Stellar Lending/Borrowing Protocol
 
 A comprehensive decentralized lending and borrowing protocol built on the Stellar network using Soroban smart contracts.
 
@@ -54,12 +54,12 @@ npm run dev
 
 ## Features
 
-- ✅ Decentralized lending and borrowing
-- ✅ Collateralized loans with multiple asset support
-- ✅ Automated liquidation system
-- ✅ Governance token (LXLM)
-- ✅ Modern web interface
-- ✅ SEP-41 token compliance
+- Decentralized lending and borrowing
+- Collateralized loans with multiple asset support
+- Automated liquidation system
+- Governance token (LXLM)
+- Modern web interface
+- SEP-41 token compliance
 
 ## License
 MIT
