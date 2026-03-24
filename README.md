@@ -1,5 +1,10 @@
 # Stellar Lending/Borrowing Protocol
 
+![CI Status](https://github.com/welson-ai/Belt-4/workflows/CI%2FCD%20Pipeline/badge.svg)
+![Rust](https://img.shields.io/badge/rust-stable-orange.svg)
+![Stellar](https://img.shields.io/badge/stellar-soroban-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 A comprehensive decentralized lending and borrowing protocol built on the Stellar network using Soroban smart contracts.
 
 ## Architecture Overview
@@ -42,7 +47,7 @@ cargo build --workspace
 cargo test --workspace
 
 # Deploy to testnet
-soroban contract deploy ...
+./scripts/deploy.sh
 ```
 
 ### Frontend Development
@@ -50,6 +55,63 @@ soroban contract deploy ...
 cd frontend
 npm install
 npm run dev
+```
+
+## Testing
+
+### Contract Tests
+```bash
+# Test all contracts
+cargo test --workspace
+
+# Test individual contracts
+cargo test -p lending-pool
+cargo test -p lxlm-token
+cargo test -p liquidation
+```
+
+### Frontend Tests
+```bash
+cd frontend
+npm test
+```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **Test**: Runs unit tests for all contracts and frontend
+- **Build**: Compiles WASM contracts for deployment
+- **Deploy Preview**: Deploys to testnet on PRs with contract addresses
+- **Vercel Deploy**: Automatically deploys frontend to production
+- **Security Scan**: Runs cargo audit and npm audit
+- **Code Quality**: Checks formatting and linting
+
+## Deployment
+
+### Automated Deployment
+Use the provided deployment script:
+
+```bash
+./scripts/deploy.sh
+```
+
+This will:
+1. Build all contracts
+2. Deploy to Stellar testnet
+3. Initialize contracts with proper addresses
+4. Save contract addresses to `deployed-addresses.json`
+5. Generate deployment summary
+
+### Manual Deployment
+```bash
+# Build contracts
+cargo build --workspace --target wasm32-unknown-unknown --release
+
+# Deploy individual contracts
+soroban contract deploy --wasm target/wasm32-unknown-unknown/release/lxlm-token.wasm --network testnet
+soroban contract deploy --wasm target/wasm32-unknown-unknown/release/lending-pool.wasm --network testnet
+soroban contract deploy --wasm target/wasm32-unknown-unknown/release/liquidation.wasm --network testnet
 ```
 
 ## Features

@@ -256,3 +256,173 @@ impl LendingPool {
         env.storage().instance().get(&TOTAL_BORROWED).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use soroban_sdk::testutils::{Address as _, AuthorizedInvocation, Ledger};
+    
+    #[test]
+    fn test_deposit() {
+        let env = Env::default();
+        env.mock_all_auths();
+        
+        let admin = Address::generate(&env);
+        let token_address = Address::generate(&env);
+        let user = Address::generate(&env);
+        
+        // Initialize contract
+        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        
+        // Mock token contract interactions
+        env.register_contract(&token_address, LxlmToken {});
+        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        
+        // Deposit 1000 XLM
+        let amount = 1000i128;
+        LendingPool::deposit(env.clone(), user.clone(), amount);
+        
+        // Verify position
+        let position = LendingPool::get_position(env.clone(), user.clone());
+        assert_eq!(position.deposited, amount);
+        assert_eq!(position.borrowed, 0);
+        
+        // Verify total deposited
+        let total_deposited = LendingPool::get_total_deposited(env.clone());
+        assert_eq!(total_deposited, amount);
+    }
+    
+    #[test]
+    fn test_borrow() {
+        let env = Env::default();
+        env.mock_all_auths();
+        
+        let admin = Address::generate(&env);
+        let token_address = Address::generate(&env);
+        let user = Address::generate(&env);
+        
+        // Initialize contract
+        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        
+        // Mock token contract interactions
+        env.register_contract(&token_address, LxlmToken {});
+        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        
+        // Deposit 1500 XLM
+        let deposit_amount = 1500i128;
+        LendingPool::deposit(env.clone(), user.clone(), deposit_amount);
+        
+        // Borrow 1000 XLM
+        let borrow_amount = 1000i128;
+        LendingPool::borrow(env.clone(), user.clone(), borrow_amount);
+        
+        // Verify position
+        let position = LendingPool::get_position(env.clone(), user.clone());
+        assert_eq!(position.deposited, deposit_amount);
+        assert_eq!(position.borrowed, borrow_amount);
+        
+        // Verify health factor = (1500 * 100) / 1000 = 150
+        let health_factor = LendingPool::get_health_factor(env.clone(), user.clone());
+        assert_eq!(health_factor, 150);
+    }
+    
+    #[test]
+    #[should_panic(expected = "Insufficient collateral")]
+    fn test_borrow_fails_undercollateralized() {
+        let env = Env::default();
+        env.mock_all_auths();
+        
+        let admin = Address::generate(&env);
+        let token_address = Address::generate(&env);
+        let user = Address::generate(&env);
+        
+        // Initialize contract
+        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        
+        // Mock token contract interactions
+        env.register_contract(&token_address, LxlmToken {});
+        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        
+        // Deposit 1000 XLM
+        let deposit_amount = 1000i128;
+        LendingPool::deposit(env.clone(), user.clone(), deposit_amount);
+        
+        // Try to borrow 900 XLM (health factor would be 111, below 150 threshold)
+        let borrow_amount = 900i128;
+        LendingPool::borrow(env.clone(), user.clone(), borrow_amount);
+    }
+    
+    #[test]
+    fn test_repay() {
+        let env = Env::default();
+        env.mock_all_auths();
+        
+        let admin = Address::generate(&env);
+        let token_address = Address::generate(&env);
+        let user = Address::generate(&env);
+        
+        // Initialize contract
+        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        
+        // Mock token contract interactions
+        env.register_contract(&token_address, LxlmToken {});
+        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        
+        // Deposit and borrow
+        let deposit_amount = 1500i128;
+        let borrow_amount = 1000i128;
+        LendingPool::deposit(env.clone(), user.clone(), deposit_amount);
+        LendingPool::borrow(env.clone(), user.clone(), borrow_amount);
+        
+        // Repay full amount
+        LendingPool::repay(env.clone(), user.clone(), borrow_amount);
+        
+        // Verify position
+        let position = LendingPool::get_position(env.clone(), user.clone());
+        assert_eq!(position.deposited, deposit_amount);
+        assert_eq!(position.borrowed, 0);
+        
+        // Verify total borrowed
+        let total_borrowed = LendingPool::get_total_borrowed(env.clone());
+        assert_eq!(total_borrowed, 0);
+    }
+    
+    #[test]
+    fn test_withdraw() {
+        let env = Env::default();
+        env.mock_all_auths();
+        
+        let admin = Address::generate(&env);
+        let token_address = Address::generate(&env);
+        let user = Address::generate(&env);
+        
+        // Initialize contract
+        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        
+        // Mock token contract interactions
+        env.register_contract(&token_address, LxlmToken {});
+        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        
+        // Deposit 1000 XLM
+        let deposit_amount = 1000i128;
+        LendingPool::deposit(env.clone(), user.clone(), deposit_amount);
+        
+        // Withdraw full amount
+        LendingPool::withdraw(env.clone(), user.clone(), deposit_amount);
+        
+        // Verify position is zero
+        let position = LendingPool::get_position(env.clone(), user.clone());
+        assert_eq!(position.deposited, 0);
+        assert_eq!(position.borrowed, 0);
+        
+        // Verify total deposited
+        let total_deposited = LendingPool::get_total_deposited(env.clone());
+        assert_eq!(total_deposited, 0);
+    }
+}
+
+// Mock token contract for testing
+struct LxlmToken;
+impl soroban_sdk::contractclient::Contract for LxlmToken {
+    const ID: &'static str = "LxlmToken";
+}
