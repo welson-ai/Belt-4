@@ -1,5 +1,7 @@
 'use client';
 
+import { SorobanHelper } from '@/lib/soroban';
+
 import { sorobanHelper } from '@/lib/soroban';
 import HealthFactorGauge from './HealthFactorGauge';
 import { UserPosition } from '@/lib/soroban';
@@ -24,7 +26,7 @@ export default function PositionCard({
   const netValue = deposited - borrowed;
   
   const formatXLM = (amount: number) => {
-    return sorobanHelper.formatXLM(amount);
+    return SorobanHelper.formatXLM(amount);
   };
 
   const getHealthStatusColor = (hf: number | undefined) => {

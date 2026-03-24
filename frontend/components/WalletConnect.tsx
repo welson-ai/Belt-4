@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { freighterApi } from '@stellar/freighter-api';
+import freighterApi from '@stellar/freighter-api';
 import { sorobanHelper } from '@/lib/soroban';
 
 interface WalletConnectProps {
@@ -22,7 +22,9 @@ export default function WalletConnect({ onConnect, onDisconnect }: WalletConnect
 
   const checkConnection = async () => {
     try {
-      const { isConnected: connected, address: walletAddress } = await freighterApi.isConnected();
+      const { isConnected: connected } = await freighterApi.isConnected();
+      const addressResponse = await freighterApi.getAddress();
+      const walletAddress = addressResponse.address;
       
       if (connected && walletAddress) {
         setIsConnected(true);
@@ -39,7 +41,8 @@ export default function WalletConnect({ onConnect, onDisconnect }: WalletConnect
     setError('');
 
     try {
-      const { address: walletAddress } = await freighterApi.getPublicKey();
+      const addressResponse = await freighterApi.getAddress();
+      const walletAddress = addressResponse.address;
       
       if (walletAddress) {
         setIsConnected(true);

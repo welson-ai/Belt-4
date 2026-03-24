@@ -132,16 +132,14 @@ export default function HealthFactorGauge({
             strokeWidth="2"
           />
           <text
-            x={centerX - radius - 10}
-            y={centerY + 4}
-            fill="#6b7280"
-            fontSize="10"
-            textAnchor="end"
-            className="transform rotate-90"
-            transformOrigin={`${centerX - radius - 10} ${centerY + 4}`}
-          >
-            0
-          </text>
+              x={centerX - radius - 10}
+              y={centerY + 4}
+              fill="#6b7280"
+              fontSize="10"
+              textAnchor="end"
+            >
+              0
+            </text>
 
           {/* 100% marker */}
           <line
@@ -172,16 +170,14 @@ export default function HealthFactorGauge({
             strokeWidth="2"
           />
           <text
-            x={centerX + radius + 10}
-            y={centerY + 4}
-            fill="#6b7280"
-            fontSize="10"
-            textAnchor="start"
-            className="transform -rotate-90"
-            transformOrigin={`${centerX + radius + 10} ${centerY + 4}`}
-          >
-            200
-          </text>
+              x={centerX + radius + 10}
+              y={centerY + 4}
+              fill="#6b7280"
+              fontSize="10"
+              textAnchor="start"
+            >
+              200
+            </text>
         </svg>
       </div>
 

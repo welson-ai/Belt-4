@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { sorobanHelper, UserPosition } from '@/lib/soroban';
+import { sorobanHelper, UserPosition, SorobanHelper } from '@/lib/soroban';
 import WalletConnect from '@/components/WalletConnect';
 import PositionCard from '@/components/PositionCard';
 import HealthFactorGauge from '@/components/HealthFactorGauge';
@@ -86,7 +86,7 @@ export default function Dashboard() {
   };
 
   const formatXLM = (amount: number) => {
-    return sorobanHelper.formatXLM(amount);
+    return SorobanHelper.formatXLM(amount);
   };
 
   const deposited = Number(userPosition?.deposited || 0);
