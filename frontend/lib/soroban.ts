@@ -3,7 +3,8 @@ import StellarSdk, {
   TransactionBuilder,
   Networks,
   BASE_FEE,
-  Soroban
+  Soroban,
+  Contract
 } from '@stellar/stellar-sdk';
 import freighterApi from '@stellar/freighter-api';
 
@@ -134,7 +135,7 @@ export class SorobanHelper {
   ): Promise<any> {
     const account = await this.server.getAccount(publicKey);
     
-    const contract = new StellarSdk.Contract(contractAddress);
+    const contract = new Contract(contractAddress);
     const operation = contract.call(methodName, ...args);
 
     return new TransactionBuilder(account, {
@@ -222,7 +223,7 @@ export class SorobanHelper {
     if (!address) return { success: false, error: 'Wallet not connected' };
 
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LENDING_POOL);
+      const contract = new Contract(CONTRACT_ADDRESSES.LENDING_POOL);
       const userScVal = xdr.ScVal.scvAddress(StellarSdk.Address.fromString(address).toScAddress());
 
       const result = await this.server.simulateTransaction(
@@ -256,7 +257,7 @@ export class SorobanHelper {
     if (!address) return { success: false, error: 'Wallet not connected' };
 
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LENDING_POOL);
+      const contract = new Contract(CONTRACT_ADDRESSES.LENDING_POOL);
       const userScVal = xdr.ScVal.scvAddress(StellarSdk.Address.fromString(address).toScAddress());
 
       const result = await this.server.simulateTransaction(
@@ -286,7 +287,7 @@ export class SorobanHelper {
 
   async getTotalDeposited(): Promise<ContractResult<number>> {
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LENDING_POOL);
+      const contract = new Contract(CONTRACT_ADDRESSES.LENDING_POOL);
 
       const result = await this.server.simulateTransaction(
         new TransactionBuilder(new StellarSdk.Account('GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '1'), {
@@ -315,7 +316,7 @@ export class SorobanHelper {
 
   async getTotalBorrowed(): Promise<ContractResult<number>> {
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LENDING_POOL);
+      const contract = new Contract(CONTRACT_ADDRESSES.LENDING_POOL);
 
       const result = await this.server.simulateTransaction(
         new TransactionBuilder(new StellarSdk.Account('GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '1'), {
@@ -350,7 +351,7 @@ export class SorobanHelper {
     if (!userAddress) return { success: false, error: 'Wallet not connected' };
 
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LXLM_TOKEN);
+      const contract = new Contract(CONTRACT_ADDRESSES.LXLM_TOKEN);
       const userScVal = xdr.ScVal.scvAddress(StellarSdk.Address.fromString(userAddress).toScAddress());
 
       const result = await this.server.simulateTransaction(
@@ -383,7 +384,7 @@ export class SorobanHelper {
    */
   async hasLiquidatablePosition(userAddress: string): Promise<ContractResult<boolean>> {
     try {
-      const contract = new StellarSdk.Contract(CONTRACT_ADDRESSES.LIQUIDATION);
+      const contract = new Contract(CONTRACT_ADDRESSES.LIQUIDATION);
       const userScVal = xdr.ScVal.scvAddress(StellarSdk.Address.fromString(userAddress).toScAddress());
 
       const result = await this.server.simulateTransaction(
