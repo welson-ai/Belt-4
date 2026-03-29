@@ -7,3 +7,6 @@ members = [
 
 [workspace.dependencies]
 soroban-sdk = "21.0.0"
+
+[profile.test]
+opt-level = 0

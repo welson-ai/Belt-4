@@ -1,5 +1,10 @@
+#![allow(dead_code)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::result_large_err)]
+#![allow(unused_variables)]
+
 use soroban_sdk::{
-    contract, contractimpl, contracttype, 
+    contract, contractimpl, contracttype,
     Address, Env, Symbol, token::Client as TokenClient,
     Map, Vec
 };
