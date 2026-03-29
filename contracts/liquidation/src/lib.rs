@@ -184,7 +184,7 @@ mod tests {
         let lending_pool_address = Address::generate(&env);
         
         // Register mock lending pool contract
-        env.register_contract(&lending_pool_address, MockLendingPoolContract {});
+        let pool_id = env.register_contract(None, MockLendingPoolContract);
         
         // Initialize liquidation contract
         LiquidationEngine::initialize(env.clone(), lending_pool_address.clone());
@@ -233,7 +233,7 @@ mod tests {
             }
         }
         
-        env.register_contract(&lending_pool_address, HealthyLendingPoolContract {});
+        env.register_contract(&lending_pool_address, HealthyLendingPoolContract);
         
         // Initialize liquidation contract
         LiquidationEngine::initialize(env.clone(), lending_pool_address.clone());
@@ -257,7 +257,7 @@ mod tests {
         let user3 = Address::generate(&env);
         
         // Register mock lending pool contract
-        env.register_contract(&lending_pool_address, MockLendingPoolContract {});
+        let pool_id = env.register_contract(None, MockLendingPoolContract);
         
         // Initialize liquidation contract
         LiquidationEngine::initialize(env.clone(), lending_pool_address.clone());

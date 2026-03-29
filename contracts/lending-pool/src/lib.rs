@@ -273,15 +273,18 @@ mod tests {
         env.mock_all_auths();
         
         let admin = Address::generate(&env);
-        let token_address = Address::generate(&env);
         let user = Address::generate(&env);
         
-        // Initialize contract
-        LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
+        // Register contracts properly
+        let token_id = env.register_contract(None, LxlmToken);
+        let pool_id = env.register_contract(None, LendingPool);
+        
+        // Initialize contracts
+        LendingPoolClient::new(&env, &pool_id).initialize(&admin, &token_id);
         
         // Mock token contract interactions
-        env.register_contract(&token_address, LxlmToken {});
-        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        env.register_contract(&token_id, LxlmToken);
+        env.register_contract(&pool_id, LxlmToken);
         
         // Deposit 1000 XLM
         let amount = 1000i128;
@@ -310,8 +313,8 @@ mod tests {
         LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
         
         // Mock token contract interactions
-        env.register_contract(&token_address, LxlmToken {});
-        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        env.register_contract(&token_address, LxlmToken);
+        env.register_contract(&env.current_contract_address(), LxlmToken);
         
         // Deposit 1500 XLM
         let deposit_amount = 1500i128;
@@ -345,8 +348,8 @@ mod tests {
         LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
         
         // Mock token contract interactions
-        env.register_contract(&token_address, LxlmToken {});
-        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        env.register_contract(&token_address, LxlmToken);
+        env.register_contract(&env.current_contract_address(), LxlmToken);
         
         // Deposit 1000 XLM
         let deposit_amount = 1000i128;
@@ -370,8 +373,8 @@ mod tests {
         LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
         
         // Mock token contract interactions
-        env.register_contract(&token_address, LxlmToken {});
-        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        env.register_contract(&token_address, LxlmToken);
+        env.register_contract(&env.current_contract_address(), LxlmToken);
         
         // Deposit and borrow
         let deposit_amount = 1500i128;
@@ -405,8 +408,8 @@ mod tests {
         LendingPool::initialize(env.clone(), admin.clone(), token_address.clone());
         
         // Mock token contract interactions
-        env.register_contract(&token_address, LxlmToken {});
-        env.register_contract(&env.current_contract_address(), LxlmToken {});
+        env.register_contract(&token_address, LxlmToken);
+        env.register_contract(&env.current_contract_address(), LxlmToken);
         
         // Deposit 1000 XLM
         let deposit_amount = 1000i128;

@@ -211,3 +211,44 @@ impl LxlmToken {
         env.events().publish((TRANSFER_EVENT, from, to), amount);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use soroban_sdk::{testutils::Address as _, Address, Env};
+
+    #[test]
+    fn test_mint_and_balance() {
+        let env = Env::default();
+        env.mock_all_auths();
+
+        let contract_id = env.register_contract(None, LxlmToken);
+        let client = LxlmTokenClient::new(&env, &contract_id);
+
+        let minter = Address::generate(&env);
+        let user = Address::generate(&env);
+
+        client.initialize(&minter);
+        client.mint(&minter, &user, &1000i128);
+
+        assert_eq!(client.balance(&user), 1000i128);
+    }
+
+    #[test]
+    fn test_burn() {
+        let env = Env::default();
+        env.mock_all_auths();
+
+        let contract_id = env.register_contract(None, LxlmToken);
+        let client = LxlmTokenClient::new(&env, &contract_id);
+
+        let minter = Address::generate(&env);
+        let user = Address::generate(&env);
+
+        client.initialize(&minter);
+        client.mint(&minter, &user, &1000i128);
+        client.burn(&minter, &user, &400i128);
+
+        assert_eq!(client.balance(&user), 600i128);
+    }
+}
