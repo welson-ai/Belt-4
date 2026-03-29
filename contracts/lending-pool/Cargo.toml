@@ -10,4 +10,5 @@ crate-type = ["cdylib"]
 soroban-sdk = "21.0.0"
 
 [dev-dependencies]
+lxlm-token = { path = "../lxlm-token" }
 soroban-sdk = { version = "21.7.6", features = ["testutils"] }

@@ -5,8 +5,7 @@
 
 use soroban_sdk::{
     contract, contractimpl, contracttype,
-    Address, Env, Symbol, token::Client as TokenClient,
-    Map, Vec
+    Address, Env, Symbol, token::Client as TokenClient
 };
 
 #[contracttype]
@@ -265,7 +264,8 @@ impl LendingPool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::testutils::{Address as _, AuthorizedInvocation, Ledger};
+    use soroban_sdk::testutils::Address as _;
+    use lxlm_token::LxlmToken;
     
     #[test]
     fn test_deposit() {
@@ -280,7 +280,8 @@ mod tests {
         let pool_id = env.register_contract(None, LendingPool);
         
         // Initialize contracts
-        LendingPoolClient::new(&env, &pool_id).initialize(&admin, &token_id);
+        let client = LendingPoolClient::new(&env, &pool_id);
+        client.initialize(&admin, &token_id);
         
         // Mock token contract interactions
         env.register_contract(&token_id, LxlmToken);
@@ -429,8 +430,8 @@ mod tests {
     }
 }
 
-// Mock token contract for testing
-struct LxlmToken;
-impl soroban_sdk::contractclient::Contract for LxlmToken {
-    const ID: &'static str = "LxlmToken";
+mod token {
+    soroban_sdk::contractimport!(
+        file = "../lxlm-token/target/wasm32-unknown-unknown/release/lxlm_token.wasm"
+    );
 }
