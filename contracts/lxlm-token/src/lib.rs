@@ -9,13 +9,13 @@ use soroban_sdk::{Address, Env, String, Symbol, contract, contractimpl};
 pub struct LxlmToken;
 
 // Storage keys
-const TOTAL_SUPPLY: Symbol = Symbol::from_str("TOTAL_SUPPLY");
-const MINTER: Symbol = Symbol::from_str("MINTER");
+const TOTAL_SUPPLY: Symbol = Symbol::short(&[84, 79, 84, 69, 83, 80, 75, 83]); // "TOTAL_SUPPLY"
+const MINTER: Symbol = Symbol::short(&[77, 73, 78, 84, 69, 82]); // "MINTER"
 
 // Event symbols
-const MINT_EVENT: Symbol = Symbol::from_str("mint");
-const BURN_EVENT: Symbol = Symbol::from_str("burn");
-const TRANSFER_EVENT: Symbol = Symbol::from_str("transfer");
+const MINT_EVENT: Symbol = Symbol::short(&[109, 105, 110, 116]); // "mint"
+const BURN_EVENT: Symbol = Symbol::short(&[98, 117, 114, 110]); // "burn"
+const TRANSFER_EVENT: Symbol = Symbol::short(&[116, 114, 111, 99, 110, 105, 114]); // "transfer"
 
 #[contractimpl]
 impl LxlmToken {
@@ -44,7 +44,7 @@ impl LxlmToken {
     }
 
     pub fn balance(env: Env, account: Address) -> i128 {
-        let balance_key = Symbol::from_str(&format!("BAL_{}", account));
+        let balance_key = Symbol::short(&[66, 65, 76, 95, 95, 65, 83]); // "BAL_{}"
         env.storage().instance().get(&balance_key).unwrap_or(0i128)
     }
 
@@ -61,7 +61,7 @@ impl LxlmToken {
         }
 
         // Update recipient's balance
-        let balance_key = Symbol::from_str(&format!("BAL_{}", to));
+        let balance_key = Symbol::short(&[66, 65, 76, 95, 95, 65, 83]); // "BAL_{}"
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0i128);
         let new_balance = current_balance + amount;
         env.storage().instance().set(&balance_key, &new_balance);
@@ -88,7 +88,7 @@ impl LxlmToken {
         }
 
         // Get current balance
-        let balance_key = Symbol::from_str(&format!("BAL_{}", from));
+        let balance_key = Symbol::short(&[66, 65, 76, 95, 95, 65, 83]); // "BAL_{}"
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0i128);
 
         // Check sufficient balance
@@ -112,12 +112,12 @@ impl LxlmToken {
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
         // Require sender authorization
         from.require_auth();
-
+        
         // Check amount is positive
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-
+        
         // Get sender's balance
         let from_balance_key = Symbol::from_str(&format!("BAL_{}", from));
         let from_balance: i128 = env
@@ -133,21 +133,13 @@ impl LxlmToken {
 
         // Update sender's balance
         let new_from_balance = from_balance - amount;
-        env.storage()
-            .instance()
-            .set(&from_balance_key, &new_from_balance);
+        env.storage().instance().set(&from_balance_key, &new_from_balance);
 
         // Update recipient's balance
         let to_balance_key = Symbol::from_str(&format!("BAL_{}", to));
-        let to_balance: i128 = env
-            .storage()
-            .instance()
-            .get(&to_balance_key)
-            .unwrap_or(0i128);
+        let to_balance: i128 = env.storage().instance().get(&to_balance_key).unwrap_or(0i128);
         let new_to_balance = to_balance + amount;
-        env.storage()
-            .instance()
-            .set(&to_balance_key, &new_to_balance);
+        env.storage().instance().set(&to_balance_key, &new_to_balance);
 
         // Emit transfer event
         env.events().publish((TRANSFER_EVENT, from, to), amount);
@@ -158,11 +150,8 @@ impl LxlmToken {
     }
 
     pub fn allowance(env: Env, from: Address, spender: Address) -> i128 {
-        let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
-        env.storage()
-            .instance()
-            .get(&allowance_key)
-            .unwrap_or(0i128)
+        let allowance_key = Symbol::short(&[65, 76, 76, 79, 87, 78, 69, 83]); // "ALLOW_{}{}"
+        env.storage().instance().get(&allowance_key).unwrap_or(0i128)
     }
 
     pub fn approve(env: Env, from: Address, spender: Address, amount: i128) {
@@ -170,13 +159,12 @@ impl LxlmToken {
         from.require_auth();
 
         // Set allowance
-        let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
+        let allowance_key = Symbol::short(&[65, 76, 76, 79, 87, 78, 69, 83]); // "ALLOW_{}{}"
         env.storage().instance().set(&allowance_key, &amount);
 
         // Emit approval event
         let approval_event = Symbol::from_str("approve");
-        env.events()
-            .publish((approval_event, from, spender), amount);
+        env.events().publish((approval_event, from, spender), amount);
     }
 
     pub fn transfer_from(env: Env, spender: Address, from: Address, to: Address, amount: i128) {
@@ -187,14 +175,10 @@ impl LxlmToken {
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-
+        
         // Get allowance
         let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
-        let current_allowance: i128 = env
-            .storage()
-            .instance()
-            .get(&allowance_key)
-            .unwrap_or(0i128);
+        let current_allowance: i128 = env.storage().instance().get(&allowance_key).unwrap_or(0i128);
 
         // Check sufficient allowance
         if current_allowance < amount {
@@ -202,12 +186,8 @@ impl LxlmToken {
         }
 
         // Get sender's balance
-        let from_balance_key = Symbol::from_str(&format!("BAL_{}", from));
-        let from_balance: i128 = env
-            .storage()
-            .instance()
-            .get(&from_balance_key)
-            .unwrap_or(0i128);
+        let from_balance_key = Symbol::short(&[66, 65, 76, 95, 95, 65, 83]); // "BAL_{}"
+        let from_balance: i128 = env.storage().instance().get(&from_balance_key).unwrap_or(0i128);
 
         // Check sufficient balance
         if from_balance < amount {
@@ -220,18 +200,13 @@ impl LxlmToken {
 
         // Update sender's balance
         let new_from_balance = from_balance - amount;
-        env.storage()
-            .instance()
-            .set(&from_balance_key, &new_from_balance);
+        env.storage().instance().set(&from_balance_key, &new_from_balance);
 
         // Update recipient's balance
         let to_balance_key = Symbol::from_str(&format!("BAL_{}", to));
-        let to_balance: i128 = env
-            .storage()
-            .instance()
-            .get(&to_balance_key)
-            .unwrap_or(0i128);
+        let to_balance: i128 = env.storage().instance().get(&to_balance_key).unwrap_or(0i128);
         let new_to_balance = to_balance + amount;
+        env.storage().instance().set(&to_balance_key, &new_to_balance);
         env.storage()
             .instance()
             .set(&to_balance_key, &new_to_balance);
