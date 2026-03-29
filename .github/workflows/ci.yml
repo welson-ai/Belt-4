@@ -215,7 +215,7 @@ jobs:
         npm run build
         
     - name: Deploy to Vercel
-      if: ${{ secrets.VERCEL_TOKEN != '' }}
+      if: ${{ vars.VERCEL_ENABLED == 'true' }}
       uses: amondnet/vercel-action@v25
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}

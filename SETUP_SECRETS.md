@@ -1,6 +1,6 @@
 # GitHub Secrets Setup Required
 
-To complete the CI/CD pipeline setup, you need to add these repository secrets:
+To complete the CI/CD pipeline setup, you need to add:
 
 ## 🔐 Required Secrets
 
@@ -18,43 +18,50 @@ Go to: **GitHub Repository → Settings → Secrets and variables → Actions**
 - **How to get**:
   1. Go to Vercel Dashboard
   2. Settings → General → Organization ID
-  3. Copy the ID
+  3. Copy and paste here
 
 ### 3. VERCEL_PROJECT_ID
 - **Description**: Vercel project ID  
 - **How to get**:
   1. Go to your Vercel project
   2. Settings → General → Project ID
-  3. Copy the ID
+  3. Copy and paste here
 
-## 🚀 What Happens Without Secrets?
+## 🚀 Required Variables (NOT Secrets)
 
-- **Security job**: ✅ Still runs (Rust install fixed)
-- **Contract deployment**: ✅ Still works (uses cargo install stellar-cli)
-- **Vercel deployment**: ⏭️ Skipped gracefully (no crash)
-- **All other jobs**: ✅ Work normally
+Go to: **GitHub Repository → Settings → Secrets and variables → Actions → Variables**
+
+### 4. VERCEL_ENABLED
+- **Type**: Variable (not Secret)
+- **Name**: VERCEL_ENABLED
+- **Value**: true
+- **Description**: Enable Vercel deployment
+
+## 🎯 Why This Approach?
+
+**GitHub Actions Security**: Secrets cannot be used in `if:` conditions for security reasons. Instead, we use:
+- **Variables** for feature flags (VERCEL_ENABLED)
+- **Secrets** for sensitive data (VERCEL_TOKEN, etc.)
 
 ## 📋 Setup Steps
 
-1. Navigate to repository secrets
-2. Click "New repository secret" for each secret
-3. Add the three secrets above
-4. Save and test with a new commit
+1. **Add 3 Secrets** (above) in Actions → Secrets
+2. **Add 1 Variable** (VERCEL_ENABLED) in Actions → Variables  
+3. Save and test with a new commit
 
 ## 🔒 Security Notes
 
-- These secrets are **encrypted** by GitHub
-- Only available to Actions workflows
-- Never exposed in logs or outputs
+- **Secrets** are encrypted and only available to Actions
+- **Variables** are visible but not sensitive
+- **VERCEL_ENABLED** acts as a feature flag
 - Rotate tokens regularly for security
 
 ## ✅ After Setup
 
-Once secrets are configured, the pipeline will:
-- ✅ Run all tests and builds
-- ✅ Deploy contracts to testnet on PRs
-- ✅ Deploy frontend to Vercel on main branch pushes
-- ✅ Run security scans
-- ✅ Check code quality
+Once configured, pipeline will:
+- ✅ Check VERCEL_ENABLED variable before deploying
+- ✅ Use secrets only within job steps (not conditions)
+- ✅ Deploy to Vercel when enabled
+- ✅ Skip gracefully when disabled
 
 **Ready for production CI/CD!** 🎯
