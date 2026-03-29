@@ -4,6 +4,7 @@ members = [
     "contracts/lxlm-token", 
     "contracts/liquidation"
 ]
+resolver = "2"
 
 [workspace.dependencies]
 soroban-sdk = "21.0.0"

@@ -7,7 +7,7 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-soroban-sdk = "21.0.0"
+soroban-sdk = "21.7.6"
 
 [dev-dependencies]
 lxlm-token = { path = "../lxlm-token" }

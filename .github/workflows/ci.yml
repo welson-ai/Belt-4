@@ -84,14 +84,14 @@ jobs:
         path: target
         key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
         
-    - name: Build lending-pool contract
-      run: |
-        cd contracts/lending-pool
-        cargo build --target wasm32-unknown-unknown --release
-        
     - name: Build lxlm-token contract
       run: |
         cd contracts/lxlm-token
+        cargo build --target wasm32-unknown-unknown --release
+        
+    - name: Build lending-pool contract
+      run: |
+        cd contracts/lending-pool
         cargo build --target wasm32-unknown-unknown --release
         
     - name: Build liquidation contract
