@@ -3,10 +3,7 @@
 #![allow(clippy::result_large_err)]
 #![allow(unused_variables)]
 
-use soroban_sdk::{
-    contract, contractimpl,
-    Address, Env, Symbol, String
-};
+use soroban_sdk::{Address, Env, String, Symbol, contract, contractimpl};
 
 #[contract]
 pub struct LxlmToken;
@@ -25,7 +22,7 @@ impl LxlmToken {
     pub fn initialize(env: Env, minter: Address) {
         // Set the minter address
         env.storage().instance().set(&MINTER, &minter);
-        
+
         // Initialize total supply to 0
         env.storage().instance().set(&TOTAL_SUPPLY, &0i128);
     }
@@ -54,26 +51,26 @@ impl LxlmToken {
     pub fn mint(env: Env, to: Address, amount: i128) {
         // Get minter address
         let minter: Address = env.storage().instance().get(&MINTER).unwrap();
-        
+
         // Require minter authorization
         minter.require_auth();
-        
+
         // Check amount is positive
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-        
+
         // Update recipient's balance
         let balance_key = Symbol::from_str(&format!("BAL_{}", to));
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0i128);
         let new_balance = current_balance + amount;
         env.storage().instance().set(&balance_key, &new_balance);
-        
+
         // Update total supply
         let current_supply: i128 = env.storage().instance().get(&TOTAL_SUPPLY).unwrap_or(0i128);
         let new_supply = current_supply + amount;
         env.storage().instance().set(&TOTAL_SUPPLY, &new_supply);
-        
+
         // Emit mint event
         env.events().publish((MINT_EVENT, to), amount);
     }
@@ -81,33 +78,33 @@ impl LxlmToken {
     pub fn burn(env: Env, from: Address, amount: i128) {
         // Get minter address
         let minter: Address = env.storage().instance().get(&MINTER).unwrap();
-        
+
         // Require minter authorization
         minter.require_auth();
-        
+
         // Check amount is positive
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-        
+
         // Get current balance
         let balance_key = Symbol::from_str(&format!("BAL_{}", from));
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0i128);
-        
+
         // Check sufficient balance
         if current_balance < amount {
             panic!("Insufficient balance to burn");
         }
-        
+
         // Update balance
         let new_balance = current_balance - amount;
         env.storage().instance().set(&balance_key, &new_balance);
-        
+
         // Update total supply
         let current_supply: i128 = env.storage().instance().get(&TOTAL_SUPPLY).unwrap_or(0i128);
         let new_supply = current_supply - amount;
         env.storage().instance().set(&TOTAL_SUPPLY, &new_supply);
-        
+
         // Emit burn event
         env.events().publish((BURN_EVENT, from), amount);
     }
@@ -115,31 +112,43 @@ impl LxlmToken {
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
         // Require sender authorization
         from.require_auth();
-        
+
         // Check amount is positive
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-        
+
         // Get sender's balance
         let from_balance_key = Symbol::from_str(&format!("BAL_{}", from));
-        let from_balance: i128 = env.storage().instance().get(&from_balance_key).unwrap_or(0i128);
-        
+        let from_balance: i128 = env
+            .storage()
+            .instance()
+            .get(&from_balance_key)
+            .unwrap_or(0i128);
+
         // Check sufficient balance
         if from_balance < amount {
             panic!("Insufficient balance to transfer");
         }
-        
+
         // Update sender's balance
         let new_from_balance = from_balance - amount;
-        env.storage().instance().set(&from_balance_key, &new_from_balance);
-        
+        env.storage()
+            .instance()
+            .set(&from_balance_key, &new_from_balance);
+
         // Update recipient's balance
         let to_balance_key = Symbol::from_str(&format!("BAL_{}", to));
-        let to_balance: i128 = env.storage().instance().get(&to_balance_key).unwrap_or(0i128);
+        let to_balance: i128 = env
+            .storage()
+            .instance()
+            .get(&to_balance_key)
+            .unwrap_or(0i128);
         let new_to_balance = to_balance + amount;
-        env.storage().instance().set(&to_balance_key, &new_to_balance);
-        
+        env.storage()
+            .instance()
+            .set(&to_balance_key, &new_to_balance);
+
         // Emit transfer event
         env.events().publish((TRANSFER_EVENT, from, to), amount);
     }
@@ -150,63 +159,83 @@ impl LxlmToken {
 
     pub fn allowance(env: Env, from: Address, spender: Address) -> i128 {
         let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
-        env.storage().instance().get(&allowance_key).unwrap_or(0i128)
+        env.storage()
+            .instance()
+            .get(&allowance_key)
+            .unwrap_or(0i128)
     }
 
     pub fn approve(env: Env, from: Address, spender: Address, amount: i128) {
         // Require owner authorization
         from.require_auth();
-        
+
         // Set allowance
         let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
         env.storage().instance().set(&allowance_key, &amount);
-        
+
         // Emit approval event
         let approval_event = Symbol::from_str("approve");
-        env.events().publish((approval_event, from, spender), amount);
+        env.events()
+            .publish((approval_event, from, spender), amount);
     }
 
     pub fn transfer_from(env: Env, spender: Address, from: Address, to: Address, amount: i128) {
         // Require spender authorization
         spender.require_auth();
-        
+
         // Check amount is positive
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-        
+
         // Get allowance
         let allowance_key = Symbol::from_str(&format!("ALLOW_{}_{}", from, spender));
-        let current_allowance: i128 = env.storage().instance().get(&allowance_key).unwrap_or(0i128);
-        
+        let current_allowance: i128 = env
+            .storage()
+            .instance()
+            .get(&allowance_key)
+            .unwrap_or(0i128);
+
         // Check sufficient allowance
         if current_allowance < amount {
             panic!("Insufficient allowance");
         }
-        
+
         // Get sender's balance
         let from_balance_key = Symbol::from_str(&format!("BAL_{}", from));
-        let from_balance: i128 = env.storage().instance().get(&from_balance_key).unwrap_or(0i128);
-        
+        let from_balance: i128 = env
+            .storage()
+            .instance()
+            .get(&from_balance_key)
+            .unwrap_or(0i128);
+
         // Check sufficient balance
         if from_balance < amount {
             panic!("Insufficient balance to transfer");
         }
-        
+
         // Update allowance
         let new_allowance = current_allowance - amount;
         env.storage().instance().set(&allowance_key, &new_allowance);
-        
+
         // Update sender's balance
         let new_from_balance = from_balance - amount;
-        env.storage().instance().set(&from_balance_key, &new_from_balance);
-        
+        env.storage()
+            .instance()
+            .set(&from_balance_key, &new_from_balance);
+
         // Update recipient's balance
         let to_balance_key = Symbol::from_str(&format!("BAL_{}", to));
-        let to_balance: i128 = env.storage().instance().get(&to_balance_key).unwrap_or(0i128);
+        let to_balance: i128 = env
+            .storage()
+            .instance()
+            .get(&to_balance_key)
+            .unwrap_or(0i128);
         let new_to_balance = to_balance + amount;
-        env.storage().instance().set(&to_balance_key, &new_to_balance);
-        
+        env.storage()
+            .instance()
+            .set(&to_balance_key, &new_to_balance);
+
         // Emit transfer event
         env.events().publish((TRANSFER_EVENT, from, to), amount);
     }
@@ -215,7 +244,7 @@ impl LxlmToken {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::{testutils::Address as _, Address, Env};
+    use soroban_sdk::{Address, Env, testutils::Address as _};
 
     #[test]
     fn test_mint_and_balance() {
