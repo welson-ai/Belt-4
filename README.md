@@ -7,7 +7,19 @@
 
 A comprehensive decentralized lending and borrowing protocol built on the Stellar network using Soroban smart contracts.
 
+## Submission Requirements
+
+### live link
+
+https://belt-4.vercel.app/
+
+### mobile view screenshot
+
 ![My Image](https://raw.githubusercontent.com/welson-ai/Belt-4/master/frontend/public/image.png)
+
+### CI/CD pipeline running 
+
+![My Image](https://raw.githubusercontent.com/welson-ai/Belt-4/master/frontend/public/image2.png)
 
 ## Architecture Overview
 
