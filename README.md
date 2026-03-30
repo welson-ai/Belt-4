@@ -7,6 +7,8 @@
 
 A comprehensive decentralized lending and borrowing protocol built on the Stellar network using Soroban smart contracts.
 
+![My Image](https://raw.githubusercontent.com/welson-ai/Belt-4/master/frontend/public/image.png)
+
 ## Architecture Overview
 
 ### Smart Contracts
